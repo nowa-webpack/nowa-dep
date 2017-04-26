@@ -2,7 +2,7 @@
 * @Author: gbk <ck0123456@gmail.com>
 * @Date:   2016-04-21 17:34:00
 * @Last Modified by:   gbk
-* @Last Modified time: 2016-06-29 23:39:55
+* @Last Modified time: 2017-04-26 11:45:22
 */
 
 'use strict';
@@ -20,7 +20,7 @@ module.exports = {
   description: pkg.description,
 
   options: [
-    [ '    --npm <npm>', 'which npm to use' ]
+    [ '    --npm <npm>', 'npm registry', 'https://registry.npm.taobao.org' ]
   ],
 
   action: function(command, options) {
@@ -38,7 +38,16 @@ module.exports = {
           fs.writeFileSync(pkgPath, JSON.stringify(pkgJson));
 
           // run npm command
-          var cmd = (options.npm || 'npm') + ' ' + command;
+          var npm = options.npm || 'npm';
+          var registry;
+          if (/^https?:\/\//.test(npm)) {
+            registry = npm;
+            npm = 'npm';
+          }
+          var cmd = npm + ' ' + command;
+          if (registry) {
+            cmd += ' --registry=' + registry;
+          }
           console.log('Running ' + cmd);
           exec(cmd, function(err, stdout, stderr) {
 
